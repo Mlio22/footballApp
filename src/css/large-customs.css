@@ -1,0 +1,116 @@
+/* navs */
+
+.nav-wrapper {
+    margin: 0 50px;
+}
+
+.logo-image {
+    width: 50px;
+    margin-top: 10px;
+}
+
+.nav-wrapper p {
+    display: inline;
+    margin: 0;
+    margin-left: 10px;
+    font-size: 1em;
+}
+
+
+/* home.html */
+
+.home {
+    margin-top: 20px;
+}
+
+.home .flag {
+    height: 350px !important;
+}
+
+.flag .carousel-item {
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    height: 350px !important;
+    min-height: initial !important;
+}
+
+.carousel.carousel-slider.center {
+    height: 350px;
+}
+
+.home .information {
+    margin-top: 20px;
+    border-radius: 20px;
+    width: 100%;
+    height: max-content;
+    background-color: #f5f5f5;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.home .time,
+.home .place {
+    font-size: 16px;
+}
+
+.home .match {
+    font-size: 24px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.match li:not(.vsDivider) {
+    flex-basis: 48%;
+}
+
+.vsDivider {
+    margin: auto 80px;
+}
+
+.score {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    font-size: 2em;
+}
+
+.versus {
+    margin-top: 5px;
+    font-size: 30px;
+}
+
+.teamName {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+
+/* competitions and saved*/
+
+.competitionsAndSaved .filterBar {
+    border-radius: 10px;
+}
+
+
+/* competition-item.html */
+
+.competition {
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.competition .flag {
+    background-size: cover;
+    height: 350px !important;
+    width: 100%;
+    border-radius: 20px;
+}
+
+.competition .descriptions {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.competition .descriptions .competitionName {
+    font-size: 2em;
+}

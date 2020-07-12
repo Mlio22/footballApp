@@ -1,0 +1,82 @@
+@import url("./loader.css");
+@import url("./large-customs.css") (min-width: 992px);
+@import url("./medium-customs.css") (min-width:600px) and (max-width: 992px);
+@import url("./small-customs.css") (max-width: 600px) and (display-mode: browser);
+@import url("./pwa-customs.css") (max-width: 600px) and (display-mode: standalone);
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.custom-theme {
+    background-color: #00658b !important;
+}
+
+.ball-icon {
+    height: 55px;
+}
+
+.indicator-item {
+    background-color: rgba(51, 48, 48, 0.5) !important;
+}
+
+.indicator-item.active {
+    background-color: #000 !important;
+}
+
+.home {
+    color: #707070;
+}
+
+.home .time {
+    text-transform: capitalize;
+}
+
+.competitionsAndSaved .container {
+    margin-top: 20px;
+}
+
+.competitionsAndSaved .card-content {
+    height: 100px !important;
+}
+
+.competitionsAndSaved .card-image img {
+    height: 150px !important;
+}
+
+.competitionsAndSaved .card-action.right-align a {
+    margin-right: 0 !important;
+}
+
+.competition .collapsible-header,
+.competition .collapsible-header:focus,
+.competition .collapsible-body {
+    background-color: #0277bd;
+    border-bottom: 1px #123d57 solid;
+}
+
+.competition .collapsible-body {
+    border-bottom: 0px !important;
+}
+
+.savedFlag {
+    height: inherit;
+    background-size: cover;
+}
+
+
+/* coloring for inputs and labels */
+
+.input-field input:focus+label,
+.material-icons.prefix.active {
+    color: #00658b !important
+}
+
+.row .input-field input:focus {
+    border-bottom: 1px solid #00658b !important;
+    box-shadow: 0 1px 0 0 #00658b !important
+}

@@ -1,0 +1,170 @@
+.pwa {
+    display: none;
+}
+
+
+/* navs */
+
+.sidenav-triggerer {
+    text-align: center;
+    margin-top: 20px;
+    background: #0277bd;
+    width: max-content;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    position: fixed;
+    top: 100px;
+    opacity: .6;
+    z-index: 3;
+    cursor: pointer;
+    transition: .2s all;
+}
+
+.sidenav-triggerer:hover {
+    opacity: 1;
+}
+
+.sidenav-triggerer i {
+    color: black;
+    margin-top: 15px;
+    height: 45px;
+    width: 45px;
+}
+
+.sidebar-icon {
+    height: 100px;
+    background-color: #0277bd;
+    margin-bottom: 20px;
+}
+
+.sidebar-icon img {
+    margin: 25px 0;
+}
+
+.sidenav a {
+    color: #F0F0F0 !important;
+}
+
+.sidenav .active {
+    background-color: #01579B !important;
+}
+
+.sidenav li i {
+    margin-top: 10px;
+}
+
+
+/* home.html */
+
+.home .col {
+    padding: 0 !important;
+}
+
+.home .flag {
+    height: 200px !important;
+}
+
+.flag>* {
+    height: 200px !important;
+}
+
+.flag .carousel-item {
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    height: 200px !important;
+    min-height: initial !important;
+}
+
+.information {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.home .time {
+    font-size: 12px;
+}
+
+.home .match {
+    font-size: 1.2em;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.home .score {
+    font-size: 2em;
+}
+
+.match li:not(.vsDivider) {
+    flex-grow: 1;
+    flex-basis: 48%;
+    margin: 0 5px;
+}
+
+.match li {
+    margin: auto;
+}
+
+.match .vsDivider {
+    margin: auto 20px;
+}
+
+.versus {
+    font-size: 20px;
+}
+
+.teamName {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.divider {
+    background-color: #707070 !important;
+    margin: 0 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.matchDetails {
+    text-align: left;
+    margin: 0 20px;
+}
+
+.matchDetails>div {
+    margin-bottom: 15px;
+}
+
+.matchDetails>div:not(.detailHeader) {
+    margin-left: 15px;
+    display: flex;
+}
+
+.lefte {
+    flex-basis: 40%;
+}
+
+.matchDetails ul li {
+    margin-bottom: 15px;
+}
+
+
+/* competitions */
+
+.competition {
+    margin-bottom: 50px;
+}
+
+.competition .flag {
+    background-size: cover;
+    height: 150px !important;
+    width: 100%;
+}
+
+.competition .descriptions {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.competition .descriptions .competitionName {
+    font-size: 1.7em;
+}

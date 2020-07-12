@@ -1,0 +1,96 @@
+<nav class="light-blue darken-3 depth-1 hide-on-small-only">
+    <div class="nav-wrapper ">
+
+        <!-- large nav menu -->
+
+        <a href="#" class="brand-logo left">
+            <img class="logo-image left" src="./src/icons/ball.ico" alt="">
+            <p>football app</p>
+
+        </a>
+        <ul class="right hide-on-med-and-down selectNav">
+            <li data-link="home">
+                <a class="waves-effect" href="#home">
+                    <i class="material-icons left">tv</i> Latest Matches
+                </a>
+            </li>
+            <li data-link="competitions">
+                <a class="waves-effect" href="#competitions">
+                    <i class="material-icons left">leaderboard</i> Competitions
+                </a>
+            </li>
+            <li data-link="saved">
+                <a class="waves-effect" href="#saved">
+                    <i class="material-icons left">save</i> Saved Pages
+                </a>
+            </li>
+        </ul>
+
+        <!-- medium dropdown menu -->
+
+        <ul id="dropdown1" class="dropdown-content selectNav">
+            <li data-link="home"><a class="waves-effect" href="#home"><span class="light-blue-text darken-3"> Latest Matches </a></li>
+            <li data-link="competitions"><a class="waves-effect " href="#competitions"><span class="light-blue-text darken-3">Competitions</span></a></li>
+            <li data-link="saved"><a class="waves-effect" href="#saved"><span class="light-blue-text darken-3">Saved Pages</span></a></li>
+        </ul>
+
+        <ul class="right hide-on-small-only hide-on-large-only">
+            <li><a class="dropdown-trigger" href="#!" data-target="dropdown1"><i class="material-icons left changeAble-icon">tv</i><span class="changeAble-text"> Latest Matches</span><i class="material-icons right">arrow_drop_down</i></a></li>
+        </ul>
+    </div>
+</nav>
+
+
+<!-- small sidebar menu -->
+
+<div data-target="nav-mobile" class="browser hide-on-med-and-up sidenav-triggerer">
+    <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+        <i class="material-icons changeAble-icon">tv</i>
+    </a>
+</div>
+
+
+<!-- small sidebar menu triggerer -->
+
+<ul class="browser sidenav light-blue darken-3 selectNav" id="nav-mobile">
+    <li class="sidebar-icon center">
+        <img class="ball-icon" src="./src/icons/ball.ico" alt="">
+    </li>
+    <li data-link="home">
+        <a href="#home">
+            <i class="material-icons left">tv</i><span> Latest Matches</span>
+        </a>
+    </li>
+    <li data-link="competitions">
+        <a href="#competitions">
+            <i class="material-icons left">leaderboard</i><span> Competitions</span>
+        </a>
+    </li>
+    <li data-link="saved">
+        <a href="#saved">
+            <i class="material-icons left">save</i><span> Saved Pages</span>
+        </a>
+    </li>
+</ul>
+
+
+<!-- 
+    materialize bottom navbar
+    source: https://codepen.io/Lcallaghan84/pen/qPRRNO?editors=1000
+-->
+
+<!-- PWA native navbar -->
+
+<footer class="page-footer pwa hide-on-med-and-up light-blue darken-3 depth-1">
+    <div class="row" id="frow">
+        <div class="col s12" style="padding-left:0px!important;padding-right:0px!important;">
+            <ul class="tabs tabs-fixed-width transparent white-text selectNav">
+                <li class="tab col s4" data-link="home">
+                    <a class="waves-effect pwa-nav" href="#home" class="white-text"><i class="material-icons black-text">tv</i></a>
+                </li>
+                <li class="tab col s4" data-link="competitions"><a class="waves-effect pwa-nav" href="#competitions" class="white-text"><i class="material-icons black-text">leaderboard</i></a></li>
+                <li class="tab col s4 saved" data-link="saved"><a class="waves-effect pwa-nav" href="#saved" class="white-text"><i class="material-icons black-text">save</i></a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
