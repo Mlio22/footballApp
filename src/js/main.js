@@ -155,19 +155,17 @@ function saveDataInit(type, id, index = null) {
 }
 
 function saveDataInteraction(data) {
-    console.log("you called me huh?");
     document.querySelector(".save-btn .tooltipped").addEventListener("click", function() {
         console.log(data);
         let data_tooltip = this.attributes[2].value,
             data_index = parseInt(this.attributes[4].value),
-            data_type = this.attributes[3].value
+            data_type = this.attributes[3].value;
 
         if (!(data_tooltip === "Already Saved" || data_tooltip === "Saved")) {
 
-            console.log(data, data_index);
             var saveData = data_index + 1 ? data[data_index] : data;
             saveItem(data_type, saveData)
-                .then((response) => {
+                .then(() => {
                     this.setAttribute("data-tooltip", "Saved");
                     $(".tooltipped").tooltip("close");
                     setTimeout(() => {
@@ -175,24 +173,23 @@ function saveDataInteraction(data) {
                         setTimeout(() => {
                             $(".tooltipped").tooltip("close");
                         }, 1000)
-                    }, 100)
+                    }, 350)
 
                 });
-
         }
     })
 }
 document.addEventListener("DOMContentLoaded", function() {
     // fetching navbar(s).
 
-    if (!("serviceWorker" in navigator)) {
-        console.log("service worker not available");
-    } else {
-        navigator.serviceWorker.register("./sw.js")
-            .then((reg) => {
-                console.log(`registration ${reg} finished`);
-            })
-    }
+    // if (!("serviceWorker" in navigator)) {
+    //     console.log("service worker not available");
+    // } else {
+    //     navigator.serviceWorker.register("./sw.js")
+    //         .then((reg) => {
+    //             console.log(`registration ${reg} finished`);
+    //         })
+    // }
 
     getNavBar()
         .then(() => {

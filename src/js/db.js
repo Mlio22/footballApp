@@ -11,13 +11,12 @@ const dbPromise = idb.open("footballDb", 1, function(upDb) {
 })
 
 function saveItem(type, item) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {
                 return;
             }
 
-            console.log(item);
             item["saved_time"] = new Date()
             item["type"] = type
             const tx = db.transaction(type, "readwrite");
@@ -27,7 +26,23 @@ function saveItem(type, item) {
             resolve(tx.complete);
         })
     })
+}
 
+function delete_item(type, id) {
+    return new Promise(resolve => {
+        dbPromise.then(db => {
+            if (!(type === "match" || type === "competition")) {
+                return;
+            }
+
+            const tx = db.transaction(type, "readwrite");
+            const store = tx.objectStore(type);
+
+            store.delete(id);
+
+            resolve(tx.complete)
+        })
+    })
 }
 
 function getSaved(type, id) {

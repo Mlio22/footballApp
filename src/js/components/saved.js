@@ -87,12 +87,16 @@ function getSavedMatch(id) {
             document.querySelector(".page-content").innerHTML = responseText
 
             // a litte exception
-            document.querySelector(".fixed-action-btn a").setAttribute("data-tooltip", "delete");
+            deleteInit("match", id);
             document.querySelector(".fixed-action-btn i").innerHTML = "delete";
 
             getSaved("match", parseInt(id))
                 .then(response => {
-                    console.log(response);
+                    if (!response) {
+                        document.querySelector(".page-content").innerHTML = "Saved content not found, Maybe you deleted it?";
+                        return;
+                    }
+
                     let { competition, date, flag, referees, score, status, team } = response;
 
                     date = getTimeMatch(date);
@@ -116,6 +120,9 @@ function getSavedMatch(id) {
                     document.querySelector(".matchDetails .refereesName").appendChild(ulElement)
                     $('.tooltipped').tooltip();
                 })
+
+
+            deleteInteraction();
         })
 }
 
@@ -126,16 +133,24 @@ function getSavedCompetition(id) {
             document.querySelector(".page-content").innerHTML = responseText
 
             // a litte exception
-            document.querySelector(".fixed-action-btn a").setAttribute("data-tooltip", "delete");
             document.querySelector(".fixed-action-btn i").innerHTML = "delete"
+
+            deleteInit("competition", id);
 
             getSaved("competition", parseInt(id))
                 .then(response => {
+                    if (!response) {
+                        document.querySelector(".page-content").innerHTML = "Saved content not found, Maybe you deleted it?";
+                        return;
+                    }
                     // since it doing in the same way and result
                     renderCompetitionItem(response)
                 })
             $('.collapsible').collapsible();
             $('.tooltipped').tooltip();
+
+            deleteInteraction();
+
         })
 }
 
@@ -159,4 +174,44 @@ function searchSaved(filters, renderContents) {
             }
         })
     })
+}
+
+function deleteInit(type, id) {
+    const tooltipBtn = document.querySelector(".tooltipped");
+    let msg = "";
+
+    checkSaved(type, id)
+        .then(response => {
+            msg = response !== undefined ? "Delete" : "Deleted";
+
+            tooltipBtn.setAttribute("data-tooltip", msg);
+            tooltipBtn.setAttribute("data-type", type);
+            tooltipBtn.setAttribute("data-id", id);
+        })
+}
+
+function deleteInteraction() {
+    console.log("yaharo");
+    document.querySelector(".tooltipped").addEventListener("click", function() {
+        let data_tooltip = this.attributes[2].value,
+            data_id = parseInt(this.attributes[4].value),
+            data_type = this.attributes[3].value;
+
+        if (data_tooltip !== "Deleted") {
+            delete_item(data_type, data_id)
+                .then(() => {
+                    this.setAttribute("data-tooltip", "Deleted");
+                    $(".tooltipped").tooltip("close");
+                    setTimeout(() => {
+                        $('.tooltipped').tooltip("open");
+                        setTimeout(() => {
+                            $(".tooltipped").tooltip("close");
+                        }, 3000)
+                    }, 350)
+                })
+
+        }
+    })
+
+
 }
