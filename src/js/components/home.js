@@ -6,7 +6,6 @@ var { signal: signalHome } = controllerHome
 // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
 
 function formatDate(d) {
-
     var month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
         year = d.getFullYear();
@@ -15,7 +14,7 @@ function formatDate(d) {
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-
+    console.log([year, month, day].join('-'));
     return [year, month, day].join('-');
 }
 
@@ -180,12 +179,13 @@ function descToArr(data) {
 }
 
 function getHomeData(homeElement) {
-    let yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1)
 
-    yesterday = formatDate(yesterday)
+    let today = new Date();
+    today.setDate(today.getDate())
 
-    const fetchUrl = `https://api.football-data.org/v2/matches?dateFrom=${yesterday}&dateTo=${yesterday}`;
+    today = formatDate(today)
+
+    const fetchUrl = `https://api.football-data.org/v2/matches?dateFrom=${today}&dateTo=${today}`;
 
     return new Promise(resolve => {
         controllerHome = new AbortController();
@@ -193,8 +193,12 @@ function getHomeData(homeElement) {
 
         fetchAndCache(fetchUrl, getNewOptions(signalHome), "json")
             .then(responseJson => {
-                let datas = []
+                let datas = [];
+
                 responseJson.matches.forEach(data => {
+                    if (data.status === "SCHEDULED") {
+                        notifyMatch(data);
+                    }
                     datas.push(descToArr(data));
                 })
 

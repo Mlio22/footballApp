@@ -1,6 +1,7 @@
 {
     "name": "Football App",
     "short_name": "Football",
+    "gcm_sender_id": "489407451958",
     "scope": "/",
     "start_url": "/",
     "icons": [{

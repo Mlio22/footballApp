@@ -1,6 +1,6 @@
 function getNavBar() {
     return new Promise((resolve) => {
-        fetch("nav.html")
+        fetch("./components/nav.html")
             .then(toText)
             .then(responseText => {
                 document.querySelector(".navigation").innerHTML = responseText

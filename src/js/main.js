@@ -39,7 +39,6 @@ function getTimeMatch(time) {
     time = new Date(time);
     time = time.toString()
     time = time.split(" ")[4].slice(0, 5);
-
     return time
 }
 
@@ -182,14 +181,7 @@ function saveDataInteraction(data) {
 document.addEventListener("DOMContentLoaded", function() {
     // fetching navbar(s).
 
-    // if (!("serviceWorker" in navigator)) {
-    //     console.log("service worker not available");
-    // } else {
-    //     navigator.serviceWorker.register("./sw.js")
-    //         .then((reg) => {
-    //             console.log(`registration ${reg} finished`);
-    //         })
-    // }
+
 
     getNavBar()
         .then(() => {

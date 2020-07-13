@@ -82,8 +82,6 @@ self.addEventListener("fetch", function(e) {
             if (!(e.request.url.includes(".svg") || e.request.url.includes("jpg"))) {
                 return fetch(e.request)
                     .then(response => {
-                        console.log(response);
-
                         if (response.status === 200 || response) {
                             console.log("masuk sini");
 
@@ -100,5 +98,19 @@ self.addEventListener("fetch", function(e) {
             return fetch(e.request)
 
         })
+    )
+})
+
+self.addEventListener("push", function(e) {
+    let body = e.data.text() || "This is just an empty message"
+    let options = {
+        body: body,
+        icon: "/src/icons/ball.ico",
+        vibrate: [300, 300],
+
+    }
+
+    e.waitUntil(
+        self.registration.showNotification("Push Message", options)
     )
 })

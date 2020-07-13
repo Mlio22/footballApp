@@ -80,6 +80,7 @@ function renderSaved(content) {
     document.querySelector(".competitionsAndSaved .container .row.page-data").appendChild(cardWrapElement);
 }
 
+// get saved match by id
 function getSavedMatch(id) {
     fetch("./components/home.html", getNewOptions(signalSaved))
         .then(toText)
@@ -126,6 +127,7 @@ function getSavedMatch(id) {
         })
 }
 
+// get saved competition by id
 function getSavedCompetition(id) {
     fetch("./components/competition-item.html", getNewOptions(signalSaved))
         .then(toText)
@@ -209,9 +211,6 @@ function deleteInteraction() {
                         }, 3000)
                     }, 350)
                 })
-
         }
     })
-
-
 }
