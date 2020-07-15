@@ -1,10 +1,7 @@
-// const BRAZIL_FLAG = "https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg";
-// const WORLD_FLAG = "https://upload.wikimedia.org/wikipedia/commons/2/24/The_world_flag_2006.svg";
-// const EUROPE_FLAG = "https://ak.picdn.net/shutterstock/videos/823771/thumb/1.jpg";
-
+import { getNewOptions, toText, addLoader, removeLoader, fetchAndCache, saveDataInit, saveDataInteraction } from "../utils.js"
 // flags for competition-item
 
-const FLAGS = {
+export const FLAGS = {
     brazil: "https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg",
     england: "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg",
     europe: "https://ak.picdn.net/shutterstock/videos/823771/thumb/1.jpg",
@@ -19,14 +16,9 @@ const FLAGS = {
 
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 
+let isCompetitionUsed = false;
+
 // format from yyyy-mm-dd to dd-mm-yyyy
-
-function reverseString(param) {
-    // reversing string 
-    // https://www.freecodecamp.org/news/how-to-reverse-a-string-in-javascript-in-3-different-ways-75e4763c68cb/
-
-    param = param.split("").reverse().join("");
-}
 
 function getDateProp(date) {
 
@@ -42,45 +34,48 @@ function getDateProp(date) {
     return obj
 }
 
-
 // controller for abort fetch request
 var controllerCompetitions = new AbortController();
 var { signal: signalCompetitions } = controllerCompetitions
 
 
 function getCompetitionsContent(fetchSignal) {
-    const fetchUrl = "https://api.football-data.org/v2/competitions?plan=TIER_ONE";
-    addLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"));
+    if (isCompetitionUsed) {
+        const fetchUrl = "https://api.football-data.org/v2/competitions?plan=TIER_ONE";
+        addLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"));
 
-    fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
-        .then(responseJson => {
-            // set filterable array of area and name the competitons
-            let filterableCompetitionsData = [];
-            removeLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"))
+        fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
+            .then(responseJson => {
+                // set filterable array of area and name the competitons
+                let filterableCompetitionsData = [];
+                removeLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"))
 
-            responseJson.competitions.forEach(data => {
+                responseJson.competitions.forEach(data => {
 
-                filterableCompetitionsData.push({
-                    area: data.area.name,
-                    name: data.name
-                });
+                    filterableCompetitionsData.push({
+                        area: data.area.name,
+                        name: data.name
+                    });
 
-                renderCompetitions(data);
-            })
-            filterSearch(filterableCompetitionsData, responseJson.competitions)
-        });
+                    renderCompetitions(data);
+                })
+                filterSearch(filterableCompetitionsData, responseJson.competitions)
+            });
+    }
 
 }
 
 
 function renderCompetitions(data) {
-    const areaName = data.area.name;
-    const flagUrl = FLAGS[areaName.toLowerCase()];
+    if (isCompetitionUsed) {
 
-    const cardWrapElement = document.createElement("div");
-    cardWrapElement.className = "col l3 m6 s12";
+        const areaName = data.area.name;
+        const flagUrl = FLAGS[areaName.toLowerCase()];
 
-    cardWrapElement.innerHTML = `<div class="card">
+        const cardWrapElement = document.createElement("div");
+        cardWrapElement.className = "col l3 m6 s12";
+
+        cardWrapElement.innerHTML = `<div class="card">
                     <div class="card-image">
                         <img src="${flagUrl}">
 
@@ -93,7 +88,8 @@ function renderCompetitions(data) {
                     </div>
                 </div>`;
 
-    document.querySelector(".competitionsAndSaved .container .row.page-data").appendChild(cardWrapElement);
+        document.querySelector(".competitionsAndSaved .container .row.page-data").appendChild(cardWrapElement);
+    }
 }
 
 function filterSearch(filters, allData) {
@@ -120,7 +116,7 @@ function filterSearch(filters, allData) {
 
 
 
-function renderCompetitionItem(data) {
+export function renderCompetitionItem(data) {
     const {
         area: { name: area },
         name,
@@ -171,19 +167,22 @@ function renderCompetitionItem(data) {
 }
 
 function getCompetitionItem(id, fetchSignal) {
+    if (isCompetitionUsed) {
+        const fetchUrl = `https://api.football-data.org/v2/competitions/${id}`;
 
-    const fetchUrl = `https://api.football-data.org/v2/competitions/${id}`;
+        fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
+            .then(responseJson => {
+                renderCompetitionItem(responseJson);
+                saveDataInit("competition", id);
+                saveDataInteraction(responseJson);
+            })
+    }
 
-    fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
-        .then(responseJson => {
-            renderCompetitionItem(responseJson);
-            saveDataInit("competition", id);
-            saveDataInteraction(responseJson);
-        })
 }
 
 
-function getCompetitions(id = "") {
+export function getCompetitions(id = "") {
+    isCompetitionUsed = true;
     var controllerCompetitions = new AbortController();
     var { signal: signalCompetitions } = controllerCompetitions
 
@@ -209,4 +208,13 @@ function getCompetitions(id = "") {
             })
     }
 
+}
+
+export function abortCompetitions() {
+    isCompetitionUsed = false;
+    try {
+        controllerCompetitions.abort();
+    } catch (e) {
+
+    }
 }

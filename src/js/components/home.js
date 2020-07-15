@@ -1,6 +1,13 @@
 // controller for abort fetch request
 var controllerHome = new AbortController();
 var { signal: signalHome } = controllerHome
+import { getNewOptions, toText, fetchAndCache, getTimeMatch, saveDataInit, saveDataInteraction } from "../utils.js";
+import { notifyMatch } from "../background.js"
+
+var timer, a, b
+
+var isHomeused = true;
+
 
 // format date to yyyy-mm-dd
 // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
@@ -14,7 +21,7 @@ function formatDate(d) {
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-    console.log([year, month, day].join('-'));
+    // console.log([year, month, day].join('-'));
     return [year, month, day].join('-');
 }
 
@@ -27,70 +34,91 @@ function removeIndicators() {
 
 // re-render the information div
 function reRenderInfo(infoData) {
-    console.log(infoData);
-    let time = getTimeMatch(infoData.date);
+    // console.log("is home used ? ", isHomeused);
+    if (isHomeused) {
+        try {
+            let time = getTimeMatch(infoData.date);
 
-    // creating li for referees
-    const ulElement = document.createElement("ul");
-    if (infoData.referees.length > 0) {
-        infoData.referees.forEach(e => {
-            const liElement = document.createElement("li");
-            liElement.innerHTML = e.name
-            ulElement.appendChild(liElement);
-        })
-    } else {
-        ulElement.innerHTML = "<li> - </li>"
+            // creating li for referees
+            const ulElement = document.createElement("ul");
+            if (infoData.referees.length > 0) {
+                infoData.referees.forEach(e => {
+                    const liElement = document.createElement("li");
+                    liElement.innerHTML = e.name
+                    ulElement.appendChild(liElement);
+                })
+            } else {
+                ulElement.innerHTML = "<li> - </li>"
+            }
+
+            document.querySelectorAll(".information").forEach(el => {
+                el.querySelector(".time").innerHTML = `${infoData.status.toLowerCase()} - ${time} WIB`
+                el.querySelector(".homeTeam .score").innerHTML = infoData.score[0] === null ? "-" : infoData.score[0];
+                el.querySelector(".homeTeam .teamName").innerHTML = infoData.team[0];
+                el.querySelector(".awayTeam .score").innerHTML = infoData.score[1] === null ? "-" : infoData.score[1];
+                el.querySelector(".awayTeam .teamName").innerHTML = infoData.team[1];
+            })
+
+            document.querySelectorAll(".competitionName").forEach(el => {
+                el.innerHTML = infoData.competition
+            })
+
+            document.querySelector(".information .refereesName").innerHTML = "";
+            document.querySelector(".information .refereesName").appendChild(ulElement);
+        } catch (e) {}
     }
 
-    document.querySelectorAll(".information").forEach(el => {
-        el.querySelector(".time").innerHTML = `${infoData.status.toLowerCase()} - ${time} WIB`
-        el.querySelector(".homeTeam .score").innerHTML = infoData.score[0] === null ? "-" : infoData.score[0];
-        el.querySelector(".homeTeam .teamName").innerHTML = infoData.team[0];
-        el.querySelector(".awayTeam .score").innerHTML = infoData.score[1] === null ? "-" : infoData.score[1];
-        el.querySelector(".awayTeam .teamName").innerHTML = infoData.team[1];
-    })
 
-    document.querySelectorAll(".competitionName").forEach(el => {
-        el.innerHTML = infoData.competition
-    })
-
-    document.querySelector(".information .refereesName").innerHTML = "";
-    document.querySelector(".information .refereesName").appendChild(ulElement);
 }
 
+let recentElems = null
+
 function setHomeCarousel(infoDatas) {
-    const totalData = infoDatas.length;
-    const elems = document.querySelectorAll(".carousel.carousel-slider");
+    var totalData = infoDatas.length;
+    var elems = document.querySelectorAll(".carousel.carousel-slider");
+    // console.log("recent elements same? ", elems === recentElems);
+    // console.log(elems);
+    recentElems = elems;
     const options = {
         fullWidth: true,
         indicators: true
     }
-    const instances = M.Carousel.init(elems, options)
+    var instances = M.Carousel.init(elems, options)
 
     let counter = 0;
 
     function startSlideShow() {
-        console.log("slideshow started");
-        if (timer !== undefined) {
+        if (timer !== 0) {
+            // console.log("timer adalah : ", timer);
             clearTimeout(timer);
         }
-        timer = setTimeout(() => {
-            elems.forEach(el => {
-                M.Carousel.getInstance(el).next();
-                onUserInteract(el)
-            })
-            startSlideShow()
+
+        timer = setInterval(() => {
+            if (isHomeused) {
+                elems.forEach((el, idx) => {
+                    // console.log(el);
+                    // console.log(M.Carousel.getInstance(el) === instances[idx]);
+                    M.Carousel.getInstance(el).next();
+                    onUserInteract(el)
+                })
+            } else {
+                clearInterval(timer);
+            }
         }, 5000)
     }
 
     function stopWhileInteract() {
-        console.log(timer);
 
-        if (timer !== undefined) {
+        if (timer !== 0) {
             clearTimeout(timer);
 
             b = setTimeout(() => {
-                startSlideShow()
+                if (isHomeused) {
+                    startSlideShow()
+
+                } else {
+                    clearTimeout(b);
+                }
             }, 5000)
         }
     }
@@ -98,23 +126,28 @@ function setHomeCarousel(infoDatas) {
     startSlideShow();
 
     function onUserInteract(el) {
-        a = setInterval(() => {
-            if (el.className.includes("scrolling")) {
-                let newCounter = M.Carousel.getInstance(el).center,
-                    tooltip = document.querySelector(".tooltipped");
+        if (isHomeused) {
+            a = setInterval(() => {
+                if (el.className.includes("scrolling")) {
+                    let newCounter = M.Carousel.getInstance(el).center
+                        // console.log(newCounter);
 
-                newCounter = newCounter < 0 ? (newCounter % totalData) + totalData : newCounter % totalData;
+                    newCounter = newCounter < 0 ? (newCounter % totalData) + totalData : newCounter % totalData;
 
-                if (newCounter !== counter) {
-                    reRenderInfo(infoDatas[newCounter]);
-                    saveDataInit("match", infoDatas[newCounter].id, newCounter);
+                    if (newCounter !== counter) {
+                        // console.log(infoDatas[newCounter]);
+                        reRenderInfo(infoDatas[newCounter]);
+                        saveDataInit("match", infoDatas[newCounter].id, newCounter);
 
-                    counter = newCounter
+                        counter = newCounter
+                    }
+                } else {
+                    clearInterval(a);
                 }
-            } else {
-                clearInterval(a);
-            }
-        }, 200);
+            }, 200);
+        } else {
+            clearInterval(a);
+        }
     }
 
     elems.forEach(el => {
@@ -142,6 +175,16 @@ function setHomeCarousel(infoDatas) {
             windowX = window.innerWidth;
         }
     })
+}
+
+export function StopHomeSlideshows() {
+    try {
+        clearInterval(timer)
+        clearInterval(a);
+        clearTimeout(b);
+    } catch (e) {
+        // console.log(e);
+    }
 }
 
 function descToArr(data) {
@@ -217,13 +260,18 @@ function getHomeData(homeElement) {
     })
 }
 
-function getHome() {
+export function getHome() {
+    isHomeused = true
     controllerHome = new AbortController();
     var { signal: signalHome } = controllerHome
+
+    StopHomeSlideshows();
 
     fetch("./components/home.html", getNewOptions(signalHome))
         .then(toText)
         .then(responseText => {
+            StopHomeSlideshows();
+
             const homeElement = document.createElement("div")
             homeElement.className = "home";
 
@@ -243,4 +291,14 @@ function getHome() {
                     $('.tooltipped').tooltip();
                 })
         })
+}
+
+export function abortHome() {
+    isHomeused = false;
+    StopHomeSlideshows();
+    try {
+        controllerHome.abort();
+    } catch (e) {
+
+    }
 }

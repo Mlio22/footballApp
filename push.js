@@ -1,14 +1,14 @@
 const webPush = require('web-push');
 const VAPID_KEY = {
     "publicKey": "BJ-RNCcYVJZ3ltj8ygFVDX10s6_EcAFbQ7LS2Hi_202gPBv3O7zcZxycb8esTqh-izIZcQE49Lqmfk61ezB1cl8",
-    "privateKey": "ZroqCqUwkPrLh0lYepFzB1YKZ3ir8Tngmv16P5lyfGA"
+    "privateKey": "iBpPrAWSAUqhQXBRCd2Y157S_FGLS6g0ztQPNcZtdzc"
 };
 
 const PUSH_PROPERTIES = {
-    endpoint: "https://fcm.googleapis.com/fcm/send/fsoxb2KPSBU:APA91bGmdys0AxdWjzDx5R5SwiEebcLUZ6_8TBA--w0gwuRkBg0Qh5U3d4m4oYQFwpOcO1KpuYUBEBebNJWZ0zkRgQGE0y7r7AlGY5gv3X4PGkLV7hQgL7SBaTM940Bul9QZje9Bps4t",
+    endpoint: " https://fcm.googleapis.com/fcm/send/dBe2JGjuLaA:APA91bElCx9DFDvjliG5FNoWKYdyL5icwHOLu-974STyFFcnAbfBa0BCrLT0cNVF9DxoR6AmYHaLw0PIRqaOizePvVbACPJ4aUK552JsfWR5MYJJ0eD5n3S8PePtEYQRkTNRFy5wf3Or",
     keys: {
-        p256dh: "BMFrWKQgFrdv9ZDWaFymz2sJ9E3h8H19EST0NMZCuO+FuLE4Cf1RhHu1cEerKdE7ElGLvl3ANtHgPejYGwHG1Zs=",
-        auth: "+WN+pzO14kEa4d85ta4hlg=="
+        p256dh: "BIibcvMf71TekYY5xPwQU+R99sUwZy35emin5CQ7hzTmgRd4mCeZH+j1wSRc36iG+nIXUcUDJQYtD7H7jR2uru8=",
+        auth: "w6pA2AIZQ8hsVIuS+r2OpQ=="
     }
 }
 

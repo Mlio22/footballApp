@@ -1,27 +1,16 @@
 const CACHE_NAME = ["permanent-cache-v1", "temporary-data-cache-v1"];
 var PERMANENT_FILES = [
-    "/",
-
     // html(s)
     "/index.html",
-    "/nav.html",
+    "/components/nav.html",
     "/components/home.html",
     "/components/competitionsAndSaved.html",
     "/components/competition-item.html",
+    "/components/saved.html",
 
     // css(s)
-    "/src/css/customs.css",
-    "/src/css/large-customs.css",
-    "/src/css/medium-customs.css",
-    "/src/css/small-customs.css",
-    "/src/css/pwa-customs.css",
-    "/src/css/loader.css",
-
     // js(s)
-    "/src/js/main.js",
-    "/src/js/components/competitions.js",
-    "/src/js/components/home.js",
-    "/src/js/components/nav.js",
+    "/build/bundle.js",
 
     // cdn(s)
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css",
@@ -29,9 +18,6 @@ var PERMANENT_FILES = [
     "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js",
 
-    // icon(s)
-    "/src/icons/ball.ico",
-    "/src/icons/favicon.ico"
 ]
 
 self.addEventListener("install", function(e) {
@@ -59,7 +45,9 @@ self.addEventListener("fetch", function(e) {
             if (responseCache) {
                 // only refresh temporary data if it's online and use the cache if offline
                 // on main.fetchAndCache()
+                console.log(e.request.url.includes("https://api.football-data.org/v2/matches"));
                 if (e.request.url.includes("https://api.football-data.org/v2/")) {
+                    console.log("ada kok");
                     let requestClone = e.request.clone();
 
                     return fetch(requestClone)
@@ -79,21 +67,19 @@ self.addEventListener("fetch", function(e) {
 
             // adding ordinary dinamic caching for other neccessary (but not critical) files (eg: flag svgs)
             // edit : caching svg files requires big cache memory
-            if (!(e.request.url.includes(".svg") || e.request.url.includes("jpg"))) {
-                return fetch(e.request)
-                    .then(response => {
-                        if (response.status === 200 || response) {
-                            console.log("masuk sini");
+            return fetch(e.request)
+                .then(response => {
+                    if (response.status === 200 || response) {
+                        console.log("masuk sini");
 
-                            let responseClone = response.clone();
-                            console.log("adding new file to cache");
+                        let responseClone = response.clone();
+                        console.log("adding new file to cache");
 
-                            caches.open(CACHE_NAME[0])
-                                .then(cache => cache.put(e.request, responseClone))
-                        }
-                        return response
-                    })
-            }
+                        caches.open(CACHE_NAME[0])
+                            .then(cache => cache.put(e.request, responseClone))
+                    }
+                    return response
+                })
 
             return fetch(e.request)
 

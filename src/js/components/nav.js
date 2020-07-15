@@ -1,4 +1,6 @@
-function getNavBar() {
+import { toText, ICONS, TEXTS } from "../utils.js";
+
+export function getNavBar() {
     return new Promise((resolve) => {
         fetch("./components/nav.html")
             .then(toText)
@@ -48,7 +50,7 @@ function switchNavOnClick() {
     })
 }
 
-function switchNav(nav) {
+export function switchNav(nav) {
     document.querySelectorAll(".selectNav li.active").forEach(e => {
         e.classList.remove("active");
     })

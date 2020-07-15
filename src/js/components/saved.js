@@ -1,8 +1,17 @@
 var controllerSaved = new AbortController();
 var { signal: signalSaved } = controllerSaved
 
+import { getNewOptions, toText, removeLoader, getTimeMatch } from "../utils.js"
+import { FLAGS, renderCompetitionItem } from "./competitions.js";
+import { getAllSaved, checkSaved, getSaved, deleteItem } from "../db.js"
+
+let isSavedUsed = false;
+
 // get the saved dashboard
-function getSavedPage(type = null, id = null) {
+export function getSavedPage(type = null, id = null) {
+    isSavedUsed = true;
+    controllerSaved = new AbortController();
+    var { signal: signalSaved } = controllerSaved
     if (type === "match" || type === "competition") {
         type === "match" ? getSavedMatch(id) : getSavedCompetition(id);
     } else {
@@ -10,51 +19,53 @@ function getSavedPage(type = null, id = null) {
         fetch("./components/competitionsAndSaved.html", getNewOptions(signalSaved))
             .then(toText)
             .then(responseText => {
-                document.querySelector(".page-content").innerHTML = responseText
+                if (isSavedUsed) {
+                    document.querySelector(".page-content").innerHTML = responseText
 
-                // fetch saved content
-                getAllSaved()
-                    .then(datas => {
-                        removeLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"))
+                    // fetch saved content
+                    getAllSaved()
+                        .then(datas => {
+                            removeLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"))
 
-                        // sorting by time saved
-                        datas = datas.sort((a, b) => new Date(a.saved_time) - new Date(b.saved_time))
+                            // sorting by time saved
+                            datas = datas.sort((a, b) => new Date(a.saved_time) - new Date(b.saved_time))
 
-                        // set array for filter and re-render data
-                        let filterableSavedData = [],
-                            renderDatas = []
+                            // set array for filter and re-render data
+                            let filterableSavedData = [],
+                                renderDatas = []
 
-                        datas.forEach(data => {
-                            let renderContent = [],
-                                renderName, renderArea;
-                            if (data.type === "match") {
-                                renderName = `${data.team[0]} VS ${data.team[1]}`
-                                renderArea = data.competition;
+                            datas.forEach(data => {
+                                let renderContent = [],
+                                    renderName, renderArea;
+                                if (data.type === "match") {
+                                    renderName = `${data.team[0]} VS ${data.team[1]}`
+                                    renderArea = data.competition;
 
-                                renderContent = [data.id, data.flag[1], `${renderName} - ${renderArea}`, data.type];
-                                renderSaved(renderContent);
-                            } else {
-                                renderName = data.name
-                                renderArea = data.area.name;
+                                    renderContent = [data.id, data.flag[1], `${renderName} - ${renderArea}`, data.type];
+                                    renderSaved(renderContent);
+                                } else {
+                                    renderName = data.name
+                                    renderArea = data.area.name;
 
-                                renderContent = [data.id, FLAGS[data.area.name.toLowerCase()], `${renderName} - ${renderArea}`, data.type];
-                                renderSaved(renderContent);
-                            }
+                                    renderContent = [data.id, FLAGS[data.area.name.toLowerCase()], `${renderName} - ${renderArea}`, data.type];
+                                    renderSaved(renderContent);
+                                }
 
-                            renderDatas.push(renderContent);
+                                renderDatas.push(renderContent);
 
-                            // this is kinda strange
-                            // on match, renderArea is the competition
-                            // but on competition, renderArea is the area of it
+                                // this is kinda strange
+                                // on match, renderArea is the competition
+                                // but on competition, renderArea is the area of it
 
-                            filterableSavedData.push({
-                                area: renderArea,
-                                name: renderName
+                                filterableSavedData.push({
+                                    area: renderArea,
+                                    name: renderName
+                                })
                             })
-                        })
 
-                        searchSaved(filterableSavedData, renderDatas)
-                    })
+                            searchSaved(filterableSavedData, renderDatas)
+                        })
+                }
             })
     }
 }
@@ -193,14 +204,14 @@ function deleteInit(type, id) {
 }
 
 function deleteInteraction() {
-    console.log("yaharo");
     document.querySelector(".tooltipped").addEventListener("click", function() {
+        console.log(this);
         let data_tooltip = this.attributes[2].value,
             data_id = parseInt(this.attributes[4].value),
             data_type = this.attributes[3].value;
 
         if (data_tooltip !== "Deleted") {
-            delete_item(data_type, data_id)
+            deleteItem(data_type, data_id)
                 .then(() => {
                     this.setAttribute("data-tooltip", "Deleted");
                     $(".tooltipped").tooltip("close");
@@ -213,4 +224,13 @@ function deleteInteraction() {
                 })
         }
     })
+}
+
+export function abortSaved() {
+    isSavedUsed = false;
+    try {
+        controllerSaved.abort();
+    } catch (e) {
+
+    }
 }

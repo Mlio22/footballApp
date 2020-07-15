@@ -1,6 +1,10 @@
+import idb from "idb"
+
 const STORE_NAMES = ["match", "competition"]
 
-const dbPromise = idb.open("footballDb", 1, function(upDb) {
+
+const dbPromise = idb.open("footballDb", 2, function(upDb) {
+    console.log("creating this");
     if (!upDb.objectStoreNames.contains("match")) {
         upDb.createObjectStore(STORE_NAMES[0], { keyPath: "id" });
     }
@@ -10,7 +14,8 @@ const dbPromise = idb.open("footballDb", 1, function(upDb) {
     }
 })
 
-function saveItem(type, item) {
+
+export function saveItem(type, item) {
     return new Promise(resolve => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {
@@ -28,7 +33,7 @@ function saveItem(type, item) {
     })
 }
 
-function delete_item(type, id) {
+export function deleteItem(type, id) {
     return new Promise(resolve => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {
@@ -45,7 +50,7 @@ function delete_item(type, id) {
     })
 }
 
-function getSaved(type, id) {
+export function getSaved(type, id) {
     return new Promise((resolve) => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {
@@ -59,7 +64,7 @@ function getSaved(type, id) {
     })
 }
 
-function getAllSaved() {
+export function getAllSaved() {
     return new Promise((resolve) => {
         dbPromise.then(db => {
             let datas = []
@@ -80,7 +85,10 @@ function getAllSaved() {
 
 }
 
-function checkSaved(type, id) {
+export function checkSaved(type, id) {
+    // console.log("this is checksaved");
+    // console.log(dbPromise);
+
     return new Promise((resolve) => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {
@@ -89,7 +97,6 @@ function checkSaved(type, id) {
 
             const tx = db.transaction(type, "readwrite");
             const store = tx.objectStore(type);
-
             resolve(store.get(parseInt(id)))
         })
     })

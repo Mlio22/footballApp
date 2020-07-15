@@ -357,36 +357,33 @@ if (!("serviceWorker" in navigator)) {
 } else {
     navigator.serviceWorker.register("./sw.js")
         .then((reg) => {
+            if ("PushManager" in window) {
+                reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array("BFqdbYuO3YwJWDEIOm6a-TETlTeORFRgZZxxXtzKEGK2zk0o-Ia9y6ImzX-nMDe_o2mEXBP8j83YYNWog5hs-Is")
+                    })
+                    .then(sub => {
+                        console.log('Berhasil melakukan subscribe dengan p256dh key: ', btoa(String.fromCharCode.apply(
+                            null, new Uint8Array(sub.getKey('p256dh')))));
+                        console.log('Berhasil melakukan subscribe dengan auth key: ', btoa(String.fromCharCode.apply(
+                            null, new Uint8Array(sub.getKey('auth')))));
+
+                        console.log(`berhasil terhubung dengan endpoint ${sub.endpoint}`);
+
+                    })
+                    .catch(e => {
+                        console.error('Tidak dapat melakukan subscribe ', e.message);
+                    })
+            }
             console.log(`registration ${reg} finished`);
         })
 }
+
 
 if ("Notification" in window) {
     requestPermission()
 } else {
     console.log("Notification is not supported");
-}
-
-if ("PushManager" in window) {
-    navigator.serviceWorker.getRegistration()
-        .then(reg => {
-            reg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array("BJ-RNCcYVJZ3ltj8ygFVDX10s6_EcAFbQ7LS2Hi_202gPBv3O7zcZxycb8esTqh-izIZcQE49Lqmfk61ezB1cl8")
-                })
-                .then(sub => {
-                    console.log('Berhasil melakukan subscribe dengan p256dh key: ', btoa(String.fromCharCode.apply(
-                        null, new Uint8Array(sub.getKey('p256dh')))));
-                    console.log('Berhasil melakukan subscribe dengan auth key: ', btoa(String.fromCharCode.apply(
-                        null, new Uint8Array(sub.getKey('auth')))));
-
-                    console.log(`berhasil terhubung dengan endpoint ${sub.endpoint}`);
-
-                })
-                .catch(e => {
-                    console.error('Tidak dapat melakukan subscribe ', e.message);
-                })
-        })
 }
 
 var controllerSaved = new AbortController();
