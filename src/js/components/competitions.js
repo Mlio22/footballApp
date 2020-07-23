@@ -1,4 +1,4 @@
-import { getNewOptions, toText, addLoader, removeLoader, fetchAndCache, saveDataInit, saveDataInteraction } from "../utils.js"
+import { getNewOptions, toText, toJson, addLoader, removeLoader, saveDataInit, saveDataInteraction } from "../utils.js"
 // flags for competition-item
 
 export const FLAGS = {
@@ -23,7 +23,6 @@ let isCompetitionUsed = false;
 function getDateProp(date) {
 
     const dateProp = date.split("-");
-    console.log(dateProp);
 
     const obj = {
         d: dateProp[2],
@@ -35,16 +34,16 @@ function getDateProp(date) {
 }
 
 // controller for abort fetch request
-var controllerCompetitions = new AbortController();
-var { signal: signalCompetitions } = controllerCompetitions
-
+let controllerCompetitions = new AbortController();
+let { signal: signalCompetitions } = controllerCompetitions
 
 function getCompetitionsContent(fetchSignal) {
     if (isCompetitionUsed) {
         const fetchUrl = "https://api.football-data.org/v2/competitions?plan=TIER_ONE";
         addLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"));
 
-        fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
+        fetch(fetchUrl, getNewOptions(fetchSignal))
+            .then(toJson)
             .then(responseJson => {
                 // set filterable array of area and name the competitons
                 let filterableCompetitionsData = [];
@@ -77,8 +76,7 @@ function renderCompetitions(data) {
 
         cardWrapElement.innerHTML = `<div class="card">
                     <div class="card-image">
-                        <img src="${flagUrl}">
-
+                        <img src="${flagUrl}" alt="${areaName} Flag">
                     </div>
                     <div class="card-content">
                         <p>${data.name} - ${areaName}</p>
@@ -170,7 +168,8 @@ function getCompetitionItem(id, fetchSignal) {
     if (isCompetitionUsed) {
         const fetchUrl = `https://api.football-data.org/v2/competitions/${id}`;
 
-        fetchAndCache(fetchUrl, getNewOptions(fetchSignal), "json")
+        fetch(fetchUrl, getNewOptions(fetchSignal))
+            .then(toJson)
             .then(responseJson => {
                 renderCompetitionItem(responseJson);
                 saveDataInit("competition", id);
@@ -180,11 +179,10 @@ function getCompetitionItem(id, fetchSignal) {
 
 }
 
-
 export function getCompetitions(id = "") {
     isCompetitionUsed = true;
-    var controllerCompetitions = new AbortController();
-    var { signal: signalCompetitions } = controllerCompetitions
+    let controllerCompetitions = new AbortController();
+    let { signal: signalCompetitions } = controllerCompetitions
 
     if (id) {
         fetch("./components/competition-item.html", getNewOptions(signalCompetitions))

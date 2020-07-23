@@ -1,91 +1,58 @@
-const CACHE_NAME = ["permanent-cache-v1", "temporary-data-cache-v1"];
-var PERMANENT_FILES = [
-    // html(s)
-    "/index.html",
-    "/components/nav.html",
-    "/components/home.html",
-    "/components/competitionsAndSaved.html",
-    "/components/competition-item.html",
-    "/components/saved.html",
+// workbox init(s)
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+const router = workbox.routing,
+    precache = workbox.precaching,
+    expire = workbox.expiration,
+    strategy = workbox.strategies,
+    core = workbox.core,
+    cacheable = workbox.cacheableResponse;
 
-    // css(s)
-    // js(s)
-    "/build/bundle.js",
+core.skipWaiting();
+core.clientsClaim();
 
-    // cdn(s)
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css",
-    "https://fonts.googleapis.com/icon?family=Material+Icons",
-    "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js",
+if (workbox) {
+    console.log("hooray workbox is here");
+}
 
-]
+// precache all
+precache.precacheAndRoute(self.__WB_MANIFEST);
 
-self.addEventListener("install", function(e) {
-    // instalation
-    e.waitUntil(
-        caches.open(CACHE_NAME[0])
-        .then(cache => {
-            let result = cache.addAll(PERMANENT_FILES);
-            // self.location.replace("");
-            return result
-        })
-    )
-})
+// network first to all API data(s)
+router.registerRoute(
+    ({ url }) => {
+        return url.origin === "https://api.football-data.org";
+    },
+    new strategy.NetworkFirst({
+        cacheName: "API datas",
+        plugins: [
+            new expire.ExpirationPlugin({
+                // expire 1 day
+                maxAgeSeconds: 24 * 60 * 60
+            })
+        ],
+    })
+)
 
-self.addEventListener("activate", function(e) {
-    console.log("aowokawokaowkaowk1");
+// cache first to all image assets
+router.registerRoute(
+    ({ url }) => {
+        let a = new RegExp("\.(?:jpg|svg|png|jpeg)");
+        return (url.pathname.match(a));
+    },
+    new strategy.StaleWhileRevalidate({
+        cacheName: "Image Assets",
+        plugins: [
+            new expire.ExpirationPlugin({
+                // expire 30 days
+                maxAgeSeconds: 30 * 24 * 60 * 60
+            }),
+            new cacheable.CacheableResponse({
+                statuses: [0, 200]
+            })
+        ]
 
-    // activation
-})
-
-self.addEventListener("fetch", function(e) {
-    e.respondWith(
-        caches.match(e.request)
-        .then(responseCache => {
-            if (responseCache) {
-                // only refresh temporary data if it's online and use the cache if offline
-                // on main.fetchAndCache()
-                console.log(e.request.url.includes("https://api.football-data.org/v2/matches"));
-                if (e.request.url.includes("https://api.football-data.org/v2/")) {
-                    console.log("ada kok");
-                    let requestClone = e.request.clone();
-
-                    return fetch(requestClone)
-                        .then(newResponseCache => {
-                            if (!newResponseCache || newResponseCache.status !== 200) {
-                                return responseCache
-                            }
-                            return newResponseCache
-                        })
-                        .catch((err) => {
-                            console.log(`using latest data of ${e.request.url} because of ${err}`);
-                            return responseCache
-                        })
-                }
-                return responseCache
-            }
-
-            // adding ordinary dinamic caching for other neccessary (but not critical) files (eg: flag svgs)
-            // edit : caching svg files requires big cache memory
-            return fetch(e.request)
-                .then(response => {
-                    if (response.status === 200 || response) {
-                        console.log("masuk sini");
-
-                        let responseClone = response.clone();
-                        console.log("adding new file to cache");
-
-                        caches.open(CACHE_NAME[0])
-                            .then(cache => cache.put(e.request, responseClone))
-                    }
-                    return response
-                })
-
-            return fetch(e.request)
-
-        })
-    )
-})
+    })
+)
 
 self.addEventListener("push", function(e) {
     let body = e.data.text() || "This is just an empty message"
@@ -93,7 +60,6 @@ self.addEventListener("push", function(e) {
         body: body,
         icon: "/src/icons/ball.ico",
         vibrate: [300, 300],
-
     }
 
     e.waitUntil(

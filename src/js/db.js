@@ -4,7 +4,7 @@ const STORE_NAMES = ["match", "competition"]
 
 
 const dbPromise = idb.open("footballDb", 2, function(upDb) {
-    console.log("creating this");
+    console.log("creating IndexedDb Stores");
     if (!upDb.objectStoreNames.contains("match")) {
         upDb.createObjectStore(STORE_NAMES[0], { keyPath: "id" });
     }
@@ -86,9 +86,6 @@ export function getAllSaved() {
 }
 
 export function checkSaved(type, id) {
-    // console.log("this is checksaved");
-    // console.log(dbPromise);
-
     return new Promise((resolve) => {
         dbPromise.then(db => {
             if (!(type === "match" || type === "competition")) {

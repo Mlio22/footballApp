@@ -1,8 +1,13 @@
 @import "./loader.css";
 @import "./large-customs.css" (min-width: 992px);
 @import "./medium-customs.css" (min-width:600px) and (max-width: 992px);
-@import "./small-customs.css" (max-width: 600px) and (display-mode: browser);
-@import "./pwa-customs.css" (max-width: 600px) and (display-mode: standalone);
+@import "./small-customs.css" (max-width: 600px);
+
+/* because of issues, pwa buttons are disabled :( */
+
+
+/* @import "./pwa-customs.css" (max-width: 600px) and (display-mode: standalone); */
+
 * {
     padding: 0;
     margin: 0;

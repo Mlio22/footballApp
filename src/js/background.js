@@ -1,10 +1,9 @@
 let isNotificationGranted = false
 
 function requestPermission() {
-    console.log("requesting");
+    console.log("requesting permission for notification");
     Notification.requestPermission()
         .then(result => {
-            console.log(result);
             if (result === "denied") return console.log("notification denied");
             else if (result === "default") return console.log("notification exited");
             isNotificationGranted = true;
@@ -17,11 +16,9 @@ let notifyTimeout = 0
 export function notifyMatch(data) {
     if (notifyTimeout === 0 && isNotificationGranted) {
         const countDown = new Date(data.utcDate) - Date.now();
-        console.log(`countdown akan mulai dalam ${countDown/(1000*60*60)} jam lagi`);
         notifyTimeout = setTimeout(() => {
-            console.log("OwO");
             showMatchNotification(data.awayTeam.name, data.homeTeam.name)
-        }, 5000);
+        }, countDown);
     }
 }
 
@@ -29,8 +26,8 @@ function showMatchNotification(away, home) {
     const title = `KICK OFF!`
     const options = {
         body: `${home} VS ${away} Has been Started`,
-        icon: "/src/icons/ball.ico",
-        badge: "/src/icons/ball.ico",
+        icon: "./src/icons/ball2.ico",
+        badge: "./src/icons/ball2.ico",
         tag: "match-notification",
         renotify: true,
         vibrate: [300, 300]
@@ -40,10 +37,9 @@ function showMatchNotification(away, home) {
 
         navigator.serviceWorker.ready.
         then(reg => {
-                console.log("mau ngirim nih");
                 reg.showNotification(title, options)
             })
-            .catch(e => console.log(e))
+            .catch(e => console.error(e))
     }
 }
 
@@ -63,5 +59,5 @@ export function urlBase64ToUint8Array(base64String) {
 if ("Notification" in window) {
     requestPermission()
 } else {
-    console.log("Notification is not supported");
+    console.error("Notification is not supported");
 }

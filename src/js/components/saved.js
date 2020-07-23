@@ -1,5 +1,5 @@
-var controllerSaved = new AbortController();
-var { signal: signalSaved } = controllerSaved
+let controllerSaved = new AbortController();
+let { signal: signalSaved } = controllerSaved
 
 import { getNewOptions, toText, removeLoader, getTimeMatch } from "../utils.js"
 import { FLAGS, renderCompetitionItem } from "./competitions.js";
@@ -11,7 +11,7 @@ let isSavedUsed = false;
 export function getSavedPage(type = null, id = null) {
     isSavedUsed = true;
     controllerSaved = new AbortController();
-    var { signal: signalSaved } = controllerSaved
+    let { signal: signalSaved } = controllerSaved
     if (type === "match" || type === "competition") {
         type === "match" ? getSavedMatch(id) : getSavedCompetition(id);
     } else {
@@ -26,6 +26,8 @@ export function getSavedPage(type = null, id = null) {
                     getAllSaved()
                         .then(datas => {
                             removeLoader(document.querySelector(".competitionsAndSaved .container .row.page-data"))
+                            console.log(datas);
+                            if (datas.length === 0) document.querySelector(".competitionsAndSaved .container .row.page-data").innerHTML = "No saved data available"
 
                             // sorting by time saved
                             datas = datas.sort((a, b) => new Date(a.saved_time) - new Date(b.saved_time))
@@ -77,8 +79,7 @@ function renderSaved(content) {
 
     cardWrapElement.innerHTML = `<div class="card">
                     <div class="card-image">
-                        <img src="${flagUrl}">
-
+                        <img src="${flagUrl}" alt="Area Flag">
                     </div>
                     <div class="card-content">
                         <p>${title}</p>
@@ -114,7 +115,6 @@ function getSavedMatch(id) {
                     date = getTimeMatch(date);
 
                     document.querySelectorAll(".home> div").forEach(el => {
-                        console.log(el);
                         el.querySelector(".time").innerHTML = `${status.toLowerCase()} - ${date} WIB`;
                         el.querySelector(".savedFlag").setAttribute("style", `background-image: url('${flag[1]}')`)
                         el.querySelector(".homeTeam .score").innerHTML = score[0] === null ? " - " : score[0];
@@ -195,7 +195,12 @@ function deleteInit(type, id) {
 
     checkSaved(type, id)
         .then(response => {
-            msg = response !== undefined ? "Delete" : "Deleted";
+            if (response) {
+                msg = "Delete";
+            } else {
+                msg = "Deleted"
+                tooltipBtn.classList.add("disabled");
+            }
 
             tooltipBtn.setAttribute("data-tooltip", msg);
             tooltipBtn.setAttribute("data-type", type);
@@ -205,23 +210,27 @@ function deleteInit(type, id) {
 
 function deleteInteraction() {
     document.querySelector(".tooltipped").addEventListener("click", function() {
-        console.log(this);
         let data_tooltip = this.attributes[2].value,
             data_id = parseInt(this.attributes[4].value),
             data_type = this.attributes[3].value;
 
         if (data_tooltip !== "Deleted") {
+            $(".tooltipped").tooltip("close");
+
             deleteItem(data_type, data_id)
                 .then(() => {
+                    this.classList.add("disabled");
                     this.setAttribute("data-tooltip", "Deleted");
-                    $(".tooltipped").tooltip("close");
                     setTimeout(() => {
                         $('.tooltipped').tooltip("open");
                         setTimeout(() => {
                             $(".tooltipped").tooltip("close");
                         }, 3000)
-                    }, 350)
+                    }, 200)
                 })
+        } else {
+            this.setAttribute("data-tooltip", "Already Deleted");
+            $('.tooltipped').tooltip("open");
         }
     })
 }

@@ -1,18 +1,15 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const workboxPlugin = require('workbox-webpack-plugin');
-const manifestPlugin = require('webpack-manifest-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
+const workbox = require('workbox-webpack-plugin');
 
 module.exports = {
     entry: "./src/js/main.js",
     output: {
-        path: path.resolve(__dirname, "build"),
-        filename: "bundle.js",
-        publicPath: "/assets/"
+        path: path.resolve(__dirname, "/"),
+        filename: "bundle.js"
     },
-    mode: "production",
+    mode: "development",
     module: {
         rules: [{
                 test: /\.html/,
@@ -25,9 +22,9 @@ module.exports = {
             },
             {
                 test: /\.(ico|png|jpe?g|gif|svg)$/i,
-                loader: "file-loader",
+                loader: "file-loader?name=[name].[ext]",
                 options: {
-                    outputPath: "/icons/[name].[hash].[ext]"
+                    publicPath: "./assets/"
                 }
             },
             {
@@ -36,20 +33,13 @@ module.exports = {
                     "style-loader", "css-loader"
                 ]
             },
-            // {
-            //     test: /\.json/,
-            //     loader: "json-loader"
-            // }
         ]
     },
     plugins: [
-        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: "./index.html",
             filename: "index.html",
         }),
-        new manifestPlugin(),
-        new FaviconsWebpackPlugin("./src/icons/android-chrome-512x512.png"),
         new HtmlWebpackPlugin({
             template: "./components/competition-item.html",
             filename: "components/competition-item.html"
@@ -64,15 +54,23 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./components/nav.html",
-            filename: "components/nav.html"
+            filename: "components/nav.html",
+            hash: false
         }),
         new HtmlWebpackPlugin({
             template: "./components/saved.html",
             filename: "components/saved.html"
         }),
-        new workboxPlugin.GenerateSW({
-            swDest: 'sw.js',
-            clientsClaim: true,
+        new CopyPlugin({
+            patterns: [
+                { from: "./manifest.json", to: "./manifest.json" },
+                { from: "./src/icons/*", to: "./src/icons/" },
+                { from: "./src/icons/favicon.ico", to: "./favicon.ico" },
+            ]
         }),
+        new workbox.InjectManifest({
+            swSrc: "./sw.js",
+            swDest: "./sw.js"
+        })
     ],
 }

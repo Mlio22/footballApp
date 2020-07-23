@@ -62,37 +62,6 @@ export function removeLoader(element) {
     } catch (err) {}
 }
 
-
-// fetch and cache old 
-export function fetchAndCache(url, fetchOptions, returnType) {
-    const request = new Request(url);
-
-    return new Promise((resolve) => {
-        fetch(url, fetchOptions)
-            .then(response => {
-                if (response.status === 200) {
-                    console.log(`adding / updating data of ${url}`);
-
-                    // cache the temporary data for first SPA load
-                    // while serviceWorker is not on the fetch state
-
-                    let responseClone = response.clone();
-                    caches.open("temporary-data-cache-v1")
-                        .then(cache => cache.put(request, responseClone));
-                }
-
-                if (returnType === "json") {
-                    resolve(response.json())
-                } else if (returnType === "text") {
-                    resolve(response.text())
-                }
-            })
-            .catch(err => {
-                document.querySelector(".page-content").innerHTML = `error happened : ${err}`;
-            })
-    })
-}
-
 // saves file 
 export function saveDataInit(type, id, index = null) {
 
@@ -100,7 +69,13 @@ export function saveDataInit(type, id, index = null) {
     let msg = ""
     checkSaved(type, id)
         .then(response => {
-            msg = response ? "Already Saved" : "save"
+            if (response) {
+                msg = "Already Saved";
+                tooltipBtn.classList.add("disabled")
+            } else {
+                msg = "Save";
+                tooltipBtn.classList.remove("disabled");
+            }
             tooltipBtn.setAttribute("data-tooltip", msg);
             tooltipBtn.setAttribute("data-type", type);
             tooltipBtn.setAttribute("data-index", index);
@@ -111,27 +86,28 @@ export function saveDataInit(type, id, index = null) {
 
 export function saveDataInteraction(data) {
     document.querySelector(".save-btn .tooltipped").addEventListener("click", function() {
-        console.log(data);
-        console.log(this);
         let data_tooltip = this.attributes[2].value,
             data_index = parseInt(this.attributes[4].value),
             data_type = this.attributes[3].value;
 
         if (!(data_tooltip === "Already Saved" || data_tooltip === "Saved")) {
+            $(".tooltipped").tooltip("close");
 
-            var saveData = data_index + 1 ? data[data_index] : data;
+            let saveData = data_index + 1 ? data[data_index] : data;
             saveItem(data_type, saveData)
                 .then(() => {
+                    this.classList.add("disabled");
                     this.setAttribute("data-tooltip", "Saved");
-                    $(".tooltipped").tooltip("close");
                     setTimeout(() => {
                         $('.tooltipped').tooltip("open");
                         setTimeout(() => {
                             $(".tooltipped").tooltip("close");
                         }, 1000)
-                    }, 350)
-
+                    }, 200)
                 });
+        } else {
+            this.setAttribute("data-tooltip", "Already Saved");
+            $('.tooltipped').tooltip("open");
         }
     })
 }
@@ -139,8 +115,6 @@ export function saveDataInteraction(data) {
 export function switchUrl(e = "") {
     const url = window.location.href;
     let param = url.split("#")[1] || "";
-
-    console.log(param);
 
     addLoader(document.querySelector(".page-content"));
     StopHomeSlideshows();
@@ -158,7 +132,6 @@ export function switchUrl(e = "") {
         if (params) {
             params = params.split("&");
             [type, id] = [params[0], params[1]];
-            console.log(type, id);
         }
         getSavedPage(type, id);
     } else {

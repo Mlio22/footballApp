@@ -43,9 +43,9 @@ function switchNavOnClick() {
             if (!this.className.includes("active")) {
                 const key = this.dataset.link;
                 switchNav(key);
-
-                $(".sidenav").sidenav("close");
             }
+            $(".sidenav").sidenav("close");
+
         })
     })
 }

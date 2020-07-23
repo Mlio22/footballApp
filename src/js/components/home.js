@@ -1,19 +1,19 @@
 // controller for abort fetch request
-var controllerHome = new AbortController();
-var { signal: signalHome } = controllerHome
-import { getNewOptions, toText, fetchAndCache, getTimeMatch, saveDataInit, saveDataInteraction } from "../utils.js";
+let controllerHome = new AbortController();
+let { signal: signalHome } = controllerHome
+import { getNewOptions, toText, toJson, getTimeMatch, saveDataInit, saveDataInteraction } from "../utils.js";
 import { notifyMatch } from "../background.js"
 
-var timer, a, b
+let timer, a, b
 
-var isHomeused = true;
+let isHomeused = true;
 
 
 // format date to yyyy-mm-dd
 // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
 
 function formatDate(d) {
-    var month = '' + (d.getMonth() + 1),
+    let month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
         year = d.getFullYear();
 
@@ -21,7 +21,6 @@ function formatDate(d) {
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-    // console.log([year, month, day].join('-'));
     return [year, month, day].join('-');
 }
 
@@ -34,7 +33,6 @@ function removeIndicators() {
 
 // re-render the information div
 function reRenderInfo(infoData) {
-    // console.log("is home used ? ", isHomeused);
     if (isHomeused) {
         try {
             let time = getTimeMatch(infoData.date);
@@ -71,36 +69,30 @@ function reRenderInfo(infoData) {
 
 }
 
-let recentElems = null
 
 function setHomeCarousel(infoDatas) {
-    var totalData = infoDatas.length;
-    var elems = document.querySelectorAll(".carousel.carousel-slider");
-    // console.log("recent elements same? ", elems === recentElems);
-    // console.log(elems);
-    recentElems = elems;
+    let totalData = infoDatas.length;
+    let elems = document.querySelectorAll(".carousel.carousel-slider");
     const options = {
         fullWidth: true,
         indicators: true
     }
-    var instances = M.Carousel.init(elems, options)
+
+    M.Carousel.init(elems, options)
 
     let counter = 0;
 
     function startSlideShow() {
-        if (timer !== 0) {
-            // console.log("timer adalah : ", timer);
+        if (timer) {
             clearTimeout(timer);
         }
 
         timer = setInterval(() => {
             if (isHomeused) {
-                elems.forEach((el, idx) => {
-                    // console.log(el);
-                    // console.log(M.Carousel.getInstance(el) === instances[idx]);
+                elems.forEach((el) => {
                     M.Carousel.getInstance(el).next();
-                    onUserInteract(el)
                 })
+                onUserInteract(screen.width > 992 ? elems[0] : elems[1]);
             } else {
                 clearInterval(timer);
             }
@@ -109,7 +101,7 @@ function setHomeCarousel(infoDatas) {
 
     function stopWhileInteract() {
 
-        if (timer !== 0) {
+        if (timer) {
             clearTimeout(timer);
 
             b = setTimeout(() => {
@@ -126,25 +118,26 @@ function setHomeCarousel(infoDatas) {
     startSlideShow();
 
     function onUserInteract(el) {
+        if (a) clearInterval(a);
         if (isHomeused) {
             a = setInterval(() => {
                 if (el.className.includes("scrolling")) {
                     let newCounter = M.Carousel.getInstance(el).center
-                        // console.log(newCounter);
 
-                    newCounter = newCounter < 0 ? (newCounter % totalData) + totalData : newCounter % totalData;
+                    newCounter = newCounter < 0 ? ((newCounter % totalData) + totalData) % totalData : newCounter % totalData;
 
                     if (newCounter !== counter) {
-                        // console.log(infoDatas[newCounter]);
+                        console.log(newCounter);
+
                         reRenderInfo(infoDatas[newCounter]);
                         saveDataInit("match", infoDatas[newCounter].id, newCounter);
-
                         counter = newCounter
                     }
+
                 } else {
                     clearInterval(a);
                 }
-            }, 200);
+            }, 300);
         } else {
             clearInterval(a);
         }
@@ -157,6 +150,7 @@ function setHomeCarousel(infoDatas) {
         })
 
         el.addEventListener("touchstart", function() {
+            console.log("started");
             onUserInteract(el);
             stopWhileInteract()
 
@@ -182,9 +176,7 @@ export function StopHomeSlideshows() {
         clearInterval(timer)
         clearInterval(a);
         clearTimeout(b);
-    } catch (e) {
-        // console.log(e);
-    }
+    } catch (e) {}
 }
 
 function descToArr(data) {
@@ -232,9 +224,10 @@ function getHomeData(homeElement) {
 
     return new Promise(resolve => {
         controllerHome = new AbortController();
-        var { signal: signalHome } = controllerHome
+        let { signal: signalHome } = controllerHome
 
-        fetchAndCache(fetchUrl, getNewOptions(signalHome), "json")
+        fetch(fetchUrl, getNewOptions(signalHome))
+            .then(toJson)
             .then(responseJson => {
                 let datas = [];
 
@@ -263,7 +256,7 @@ function getHomeData(homeElement) {
 export function getHome() {
     isHomeused = true
     controllerHome = new AbortController();
-    var { signal: signalHome } = controllerHome
+    let { signal: signalHome } = controllerHome
 
     StopHomeSlideshows();
 
