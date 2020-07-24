@@ -49,7 +49,7 @@ function webWorkerInit() {
     } else {
         // note: switch to "/" in dev mode
         // note: switch to "/build/" in prod mode
-        navigator.serviceWorker.register("./sw.js", { scope: '/' })
+        navigator.serviceWorker.register("./sw.js", { scope: '/build/' })
             .then((reg) => {
                 console.log(`sw terdaftar di ${reg.scope} dengan info ${reg}`);
                 let swStatus;
