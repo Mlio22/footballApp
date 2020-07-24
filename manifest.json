@@ -2,8 +2,8 @@
     "gcm_sender_id": "684599638781",
     "name": "Football App",
     "short_name": "Football",
-    "scope": "/build/",
-    "start_url": "/build/",
+    "scope": "/footballApp/build/",
+    "start_url": "/footballApp/build/",
     "icons": [{
             "src": "./src/icons/android-chrome-192x192.png",
             "sizes": "192x192",
